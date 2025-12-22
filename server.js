@@ -1,4 +1,4 @@
-import { log } from "console";
+
 import fs from "fs";
 import readline from "readline-sync";
 const generalUrl = "https://spies-test-server.vercel.app/";
@@ -20,7 +20,6 @@ async function fetchUsers() {
   }
 }
 
-// fetchUsers();
 
 async function fetchRecords() {
   try {
@@ -37,7 +36,6 @@ async function fetchRecords() {
     console.log(error);
   }
 }
-// fetchRecords()
 
 async function findUserByName() {
   const name = readline.question("write the name");
@@ -88,12 +86,18 @@ async function levelDanger() {
     sotrList[sotrList.length - 2][0],
     sotrList[sotrList.length - 3][0],
   ];
-  const allTopThreeDangeresPeople=sotrList.filter((list)=>{
-    let ageCurrent=list[0]
-    return topDangerAGE.find((age)=>age===ageCurrent)
+  const data1 = await fs.promises.readFile("data/people.json", "utf8");
+  const goodData1 = JSON.parse(data1);
+    const allPeopleDangerList=[]
+  topDangerAGE.map((age)=>{
+    goodData1.map((people)=>{if(people.age==age){
+        allPeopleDangerList.push(people)
+    }
+})
+    
   })
+  sendListAsUrlParam(generalUrl, allPeopleDangerList);
   const goodSortList = Object.fromEntries(sotrList);
-  
 }
 
 function wordInContent(content) {
@@ -128,3 +132,27 @@ function topDangerListToAvarge(listAgeDanger) {
   return listAgeDanger;
 }
 levelDanger();
+
+async function sendListAsUrlParam(generalUrl, list) {
+  const endpoint = "report";
+  const fullUrl = generalUrl + endpoint;
+  const params = new URLSearchParams();
+  const listAsString = list.map(encodeURIComponent).join(",");
+  params.append("listParam", listAsString);
+  const urlWithParams = fullUrl + "?" + params.toString();
+
+  console.log("Sending request to URL:", urlWithParams);
+
+  try {
+    const response = await fetch(urlWithParams);
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    const responseText = await response.text();
+    console.log("Response from server:");
+    console.log(responseText);
+  } catch (error) {
+    console.error("Error during fetch operation:", error);
+  }
+}
+
