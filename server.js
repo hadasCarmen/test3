@@ -1,4 +1,3 @@
-
 import fs from "fs";
 import readline from "readline-sync";
 const generalUrl = "https://spies-test-server.vercel.app/";
@@ -19,7 +18,6 @@ async function fetchUsers() {
     console.log(error);
   }
 }
-
 
 async function fetchRecords() {
   try {
@@ -50,7 +48,7 @@ async function findUserByName() {
 }
 
 async function findUserByAge(params) {
-  const age = readline.question("write the age");
+  const age = Number(readline.question("write the age"));
   const data = await fs.promises.readFile("data/people.json", "utf8");
   const goodData = JSON.parse(data);
 
@@ -88,14 +86,15 @@ async function levelDanger() {
   ];
   const data1 = await fs.promises.readFile("data/people.json", "utf8");
   const goodData1 = JSON.parse(data1);
-    const allPeopleDangerList=[]
-  topDangerAGE.map((age)=>{
-    goodData1.map((people)=>{if(people.age==age){
-        allPeopleDangerList.push(people)
-    }
-})
-    
-  })
+  const allPeopleDangerList = [];
+  topDangerAGE.forEach((age) => {
+    goodData1.forEach((people) => {
+      if (people.age == Number(age)) {
+        allPeopleDangerList.push(people);
+      }
+    });
+  });
+
   sendListAsUrlParam(generalUrl, allPeopleDangerList);
   const goodSortList = Object.fromEntries(sotrList);
 }
@@ -155,4 +154,3 @@ async function sendListAsUrlParam(generalUrl, list) {
     console.error("Error during fetch operation:", error);
   }
 }
-
